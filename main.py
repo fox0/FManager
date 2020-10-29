@@ -24,9 +24,13 @@ class Application(QtWidgets.QApplication):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    config.read('config.ini')
+    try:
+        config.read('config.ini')
+    except Exception as e:
+        log.exception(e)
+        # todo write config
 
     app = Application([])
-    window = MainWindow()
+    window = MainWindow(config)
     window.show()
     app.exec_()

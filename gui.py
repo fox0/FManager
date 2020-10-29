@@ -1,11 +1,18 @@
+import os
+import logging
+
 from PyQt5 import QtCore, QtWidgets
+
+log = logging.getLogger(__name__)
 
 
 class MainWindow(QtWidgets.QMainWindow):
     """Главное окно приложения"""
 
-    def __init__(self):
+    def __init__(self, config):
         super().__init__()
+        self.config = config
+
         # self.set_menu_bar()
         self.set_toolbar()
         main_layout = QtWidgets.QVBoxLayout()
@@ -25,43 +32,21 @@ class MainWindow(QtWidgets.QMainWindow):
     def set_toolbar(self):
         toolbar = QtWidgets.QToolBar()
         toolbar.setMovable(False)
-
-        action = toolbar.addAction('F2 rename')
-        action.setShortcut('F2')
-        action.triggered.connect(self.on_f2)
-
-        action = toolbar.addAction('F5 copy')
-        action.setShortcut('F5')
-        action.triggered.connect(self.on_f5)
-
-        action = toolbar.addAction('F6 move')
-        action.setShortcut('F6')
-        action.triggered.connect(self.on_f6)
-
-        action = toolbar.addAction('F7 mkdir')
-        action.setShortcut('F7')
-        action.triggered.connect(self.on_f7)
-
-        action = toolbar.addAction('F8 remove')
-        action.setShortcut('F8')
-        action.triggered.connect(self.on_f8)
-
-        action = toolbar.addAction('F9 term')
-        action.setShortcut('F9')
-        action.triggered.connect(self.on_f9)
-
-        action = toolbar.addAction('F10 exit')
-        action.setShortcut('F10')
-        action.triggered.connect(QtWidgets.qApp.quit)
-
+        for i in ('F2 rename', 'F5 copy', 'F6 move', 'F7 mkdir', 'F8 remove', 'F9 term', 'F10 exit'):
+            w = QtWidgets.QWidget()
+            w.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+            toolbar.addWidget(w)
+            a = toolbar.addAction(i)
+            t = i.split(' ', 1)[0]
+            a.setShortcut(t)
+            a.triggered.connect(getattr(self, 'on_' + t.lower()))
+        w = QtWidgets.QWidget()
+        w.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        toolbar.addWidget(w)
         self.addToolBar(QtCore.Qt.BottomToolBarArea, toolbar)
 
         # central_widget = QWidget()
         # self.setCentralWidget(central_widget)
-        #
-        # self.Search_Bar = QLineEdit("Search")
-        # self.Button = QPushButton('button')
-        #
         # layout = QGridLayout(central_widget)
         # layout.setHorizontalSpacing(0)
         # layout.setContentsMargins(0, 0, 0, 0)
@@ -110,4 +95,12 @@ class MainWindow(QtWidgets.QMainWindow):
         print('F8')
 
     def on_f9(self):
-        print('F9')
+        """F9 term"""
+        cmd = '{} {}'.format(self.config['main']['term'], '/')  # todo
+        log.debug('%s', cmd)
+        os.system(cmd)
+
+    @staticmethod
+    def on_f10():
+        """F10 exit"""
+        QtWidgets.qApp.quit()
