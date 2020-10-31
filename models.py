@@ -1,33 +1,37 @@
 """
 Модели для отрисовки данных в таблице
 """
+import os
+import logging
+
 from PyQt5 import QtCore
 
-headers = ["Scientist name", "Birthdate", "Contribution"]
-rows = [("Newton", "1643-01-04", "Classical mechanics"),
-        ("Einstein", "1879-03-14", "Relativity"),
-        ("Darwin", "1809-02-12", "Evolution")]
+log = logging.getLogger(__name__)
 
 
 class TableModel(QtCore.QAbstractTableModel):
     """Таблица с файлами"""
+    HEADERS = ('Имя', 'Размер', 'Изменён')
 
-    def rowCount(self, parent):  # noqa pylint: disable=invalid-name, no-self-use, unused-argument
-        # How many rows are there?
-        return len(rows)
+    def __init__(self):
+        super().__init__()
+        self.rows = [(i, '', '') for i in os.listdir('/home/fox/')]
+        self.rows.sort(key=lambda x: x[0])
 
-    def columnCount(self, parent):  # noqa pylint: disable=invalid-name, no-self-use, unused-argument
-        # How many columns?
-        return len(headers)
+    def columnCount(self, parent):  # noqa pylint: disable=invalid-name, unused-argument, missing-function-docstring
+        return len(self.HEADERS)
 
-    def data(self, index, role):  # noqa pylint: disable=no-self-use
-        if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
-        # What's the value of the cell at the given index?
-        return rows[index.row()][index.column()]
-
-    def headerData(self, section, orientation, role):  # noqa pylint: disable=invalid-name, no-self-use
+    def headerData(self, column, orientation, role):  # noqa pylint: disable=invalid-name, missing-function-docstring
         if role != QtCore.Qt.DisplayRole or orientation != QtCore.Qt.Horizontal:
             return QtCore.QVariant()
-        # What's the header for the given column?
-        return headers[section]
+        return self.HEADERS[column]
+
+    def rowCount(self, parent):  # noqa pylint: disable=invalid-name, unused-argument
+        return len(self.rows)
+
+    def data(self, index, role):  # noqa
+        if role != QtCore.Qt.DisplayRole:
+            return QtCore.QVariant()
+        i, j = index.row(), index.column()
+        log.debug('%d %d', i, j)
+        return self.rows[i][j]
