@@ -1,3 +1,4 @@
+import configparser
 import os
 import logging
 import shlex
@@ -11,27 +12,37 @@ log = logging.getLogger(__name__)
 class MainWindow(QtWidgets.QMainWindow):
     """Главное окно приложения"""
 
-    def __init__(self, config):
+    def __init__(self, config: configparser.ConfigParser):
         super().__init__()
         self.config = config
 
-        # self.set_menu_bar()
+        self.set_menubar()
         self.set_toolbar()
+        if self.config['main'].getboolean('show_statusbar'):
+            self.statusBar()
+
         main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(main_layout)
         # self.showMaximized()
-        # self.statusBar()
         # self.statusBar().showMessage('Ready')
 
-    # def set_menu_bar(self):
-    #     menu_bar = self.menuBar()
-    #     menu = menu_bar.addMenu('File')
-    #     action = menu.addAction('&Exit')
-    #     action.setShortcut('Ctrl+Q')
-    #     action.setStatusTip('Exit application')
-    #     action.triggered.connect(QtWidgets.qApp.quit)
+    def _log(self, value: str):
+        if self.config['main'].getboolean('show_statusbar'):
+            self.statusBar().showMessage(value)
+
+    def set_menubar(self):
+        if not self.config['main'].getboolean('show_menubar'):
+            return
+        menu_bar = self.menuBar()
+        menu = menu_bar.addMenu('File')
+        action = menu.addAction('&Exit')
+        action.setShortcut('Ctrl+Q')
+        action.setStatusTip('Exit application')
+        action.triggered.connect(QtWidgets.qApp.quit)
 
     def set_toolbar(self):
+        if not self.config['main'].getboolean('show_toolbar'):
+            return
         toolbar = QtWidgets.QToolBar()
         toolbar.setMovable(False)
         for i in ('F2 rename', 'F5 copy', 'F6 move', 'F7 mkdir', 'F8 remove', 'F9 term', 'F10 exit'):
@@ -104,8 +115,9 @@ class MainWindow(QtWidgets.QMainWindow):
             args.append('/')  # todo
             log.debug('%s', args)
             subprocess.Popen(args)
-        except KeyError as e:
-            log.warning(e)
+        except Exception as e:
+            self._log(f'{e.__class__.__name__}: {e}')
+            log.exception(e)
 
     @staticmethod
     def on_f10():
