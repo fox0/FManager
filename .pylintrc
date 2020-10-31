@@ -1,0 +1,22 @@
+[MASTER]
+#ignore-patterns=.*_pb2.py
+extension-pkg-whitelist=PyQt5
+jobs=0
+
+[FORMAT]
+max-line-length=121
+
+[BASIC]
+good-names=i,
+           j,
+           k,
+           ex,
+           _,
+           log,
+           f
+
+[MISCELLANEOUS]
+notes=FIXME,
+      XXX,
+      TODO,
+      000

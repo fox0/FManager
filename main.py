@@ -1,3 +1,6 @@
+"""
+Приложение
+"""
 import configparser
 import logging
 
@@ -12,6 +15,8 @@ config = configparser.ConfigParser()
 
 
 class Application(QtWidgets.QApplication):
+    """Приложение на Qt"""
+
     def __init__(self, config: configparser.ConfigParser, argv: list):
         super().__init__(argv)
         self.config = config
@@ -19,17 +24,18 @@ class Application(QtWidgets.QApplication):
         self.set_palette()
 
     def set_palette(self):
+        """Применить тему из конфига"""
         if 'palette' not in self.config:
             return
         palette = QtGui.QPalette()
-        for k, v in self.config['palette'].items():
-            k = lower2(k)
+        for name, color in self.config['palette'].items():
+            name = lower2(name)
             try:
-                p = getattr(QtGui.QPalette, k)
-                palette.setColor(p, QtGui.QColor(v))
-            except Exception as e:
-                log.debug('%s = %s', k, v)
-                log.exception(e)
+                pal = getattr(QtGui.QPalette, name)
+                palette.setColor(pal, QtGui.QColor(color))
+            except Exception as ex:
+                log.debug('%s = %s', name, color)
+                log.exception(ex)
         self.setPalette(palette)
 
 
@@ -37,8 +43,8 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     try:
         config.read('config.ini')
-    except Exception as e:
-        log.exception(e)
+    except Exception as ex:
+        log.exception(ex)
         # todo write config
 
     app = Application(config, [])
