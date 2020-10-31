@@ -1,5 +1,7 @@
 import os
 import logging
+import shlex
+import subprocess
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -80,27 +82,33 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.setLayout(layout)
 
     def on_f2(self):
-        print('F2')
+        log.debug('on_f2')
 
     def on_f5(self):
-        print('F5')
+        log.debug('on_f5')
 
     def on_f6(self):
-        print('F6')
+        log.debug('on_f6')
 
     def on_f7(self):
-        print('F7')
+        log.debug('on_f7')
 
     def on_f8(self):
-        print('F8')
+        log.debug('on_f8')
 
     def on_f9(self):
         """F9 term"""
-        cmd = '{} {}'.format(self.config['main']['term'], '/')  # todo
-        log.debug('%s', cmd)
-        os.system(cmd)
+        log.debug('on_f9')
+        try:
+            args = shlex.split(self.config['main']['term'])
+            args.append('/')  # todo
+            log.debug('%s', args)
+            subprocess.Popen(args)
+        except KeyError as e:
+            log.warning(e)
 
     @staticmethod
     def on_f10():
         """F10 exit"""
+        log.debug('on_f10')
         QtWidgets.qApp.quit()
