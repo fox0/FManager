@@ -1,5 +1,5 @@
 [MASTER]
-#ignore-patterns=.*_pb2.py
+ignore-patterns=ui_.*.py
 extension-pkg-whitelist=PyQt5
 jobs=0
 
